@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>WMine — Свод правил</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat+Alternates:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf3ea;
+            --card: rgba(255, 245, 235, 0.85);
+            --glass: rgba(255, 245, 235, 0.5);
+            --border: rgba(230, 120, 30, 0.2);
+            --accent: #e67a1a;
+            --accent-light: #f59a3a;
+            --accent-glow: rgba(230, 120, 30, 0.25);
+            --text: #2a1a0e;
+            --text-secondary: #6a4a2a;
+            --heading: #1a0e06;
+            --table-hover: rgba(230, 120, 30, 0.05);
+            --badge-bg: #fff0e0;
+            --badge-text: #b85a0a;
+            --block-shadow: 0 8px 32px rgba(180, 80, 20, 0.06);
+            --block-hover-shadow: 0 16px 48px rgba(180, 80, 20, 0.12);
+            --staff-card-bg: rgba(255, 245, 235, 0.6);
+            --radius: 20px;
+            --transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --font-base: 15px;
+            --font-sm: 14px;
+            --font-xs: 13px;
+            --font-heading: clamp(17px, 2.5vw, 21px);
+        }
+
+        body.dark {
+            --bg: #120a06;
+            --card: rgba(25, 15, 8, 0.92);
+            --glass: rgba(25, 15, 8, 0.6);
+            --border: rgba(230, 120, 30, 0.15);
+            --accent: #f59a3a;
+            --accent-light: #ffb05a;
+            --accent-glow: rgba(230, 120, 30, 0.15);
+            --text: #e8d5c0;
+            --text-secondary: #a08060;
+            --heading: #f0e0d0;
+            --table-hover: rgba(230, 120, 30, 0.05);
+            --badge-bg: #1a0e06;
+            --badge-text: #f59a3a;
+            --block-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --block-hover-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+            --staff-card-bg: rgba(25, 15, 8, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; text-size-adjust: 100%; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px 12px 60px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.5s, color 0.4s;
+            background-image:
+                radial-gradient(ellipse at 15% 20%, rgba(230, 120, 30, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 75%, rgba(230, 120, 30, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(230, 120, 30, 0.03) 0%, transparent 70%);
+            background-attachment: fixed;
+            font-size: var(--font-base);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body.dark {
+            background-image:
+                radial-gradient(ellipse at 15% 20%, rgba(230, 120, 30, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 75%, rgba(230, 120, 30, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(230, 120, 30, 0.02) 0%, transparent 70%);
+        }
+
+        .copyable {
+            user-select: text;
+            -webkit-user-select: text;
+            cursor: pointer;
+            transition: background 0.15s, box-shadow 0.15s;
+            border-radius: 4px;
+            padding: 1px 4px;
+            margin: -1px -4px;
+            position: relative;
+        }
+        .copyable:hover { background: rgba(230, 120, 30, 0.08); }
+        .copyable:active { background: rgba(230, 120, 30, 0.15); box-shadow: 0 0 0 3px rgba(230, 120, 30, 0.1); }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2a1a0e;
+            color: #f0e0d0;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 13px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.4s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.3px;
+        }
+        body.dark .copy-toast { background: #e8d5c0; color: #1a0e06; }
+        .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(-8px); }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            z-index: 9999;
+            background: transparent;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light), var(--accent));
+            background-size: 200% 100%;
+            animation: shimmer 2s ease-in-out infinite;
+            transition: width 0.1s linear;
+            border-radius: 0 4px 4px 0;
+        }
+        @keyframes shimmer { 0%,100% { background-position: 0% 0%; } 50% { background-position: 200% 0%; } }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1120px;
+            width: 100%;
+            padding: 32px 28px;
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 24px 60px rgba(180, 80, 20, 0.06);
+        }
+        body.dark .container { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4); }
+
+        .main-title {
+            text-align: center;
+            font-size: clamp(24px, 5.5vw, 38px);
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            padding-bottom: 16px;
+            margin-bottom: 14px;
+            border-bottom: 2px solid var(--border);
+            position: relative;
+        }
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 2px;
+        }
+        .main-title .gradient-text {
+            font-family: 'Montserrat Alternates', sans-serif;
+            display: inline-block;
+            font-size: inherit;
+            font-weight: 900;
+            background: linear-gradient(135deg, #e67a1a, #f59a3a, #ffb05a, #f59a3a, #e67a1a);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientMove 6s ease infinite;
+        }
+        @keyframes gradientMove { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+        .sub-header {
+            text-align: center;
+            font-size: var(--font-sm);
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        .badge-version {
+            display: inline-block;
+            padding: 6px 22px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: var(--font-xs);
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, var(--badge-bg), var(--glass));
+            color: var(--badge-text);
+            border: 1px solid var(--accent);
+            box-shadow: 0 2px 12px var(--accent-glow);
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .toggle-btn, .download-btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 30px;
+            font-size: var(--font-sm);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+            color: #fff;
+            text-decoration: none;
+        }
+        .toggle-btn { background: linear-gradient(135deg, var(--accent), var(--accent-light)); }
+        .download-btn { background: linear-gradient(135deg, #c95a0a, #e67a1a); }
+        .toggle-btn:hover, .download-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        .toggle-btn:active, .download-btn:active { transform: scale(0.96); }
+
+        .block {
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            background: var(--glass);
+            box-shadow: var(--block-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent), var(--accent-light));
+            border-radius: 2px 0 0 2px;
+        }
+        .block:hover { box-shadow: var(--block-hover-shadow); }
+        .block input[type="checkbox"] { display: none; }
+        .block .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            margin: -6px -10px 10px -10px;
+            border-radius: 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .block .header:hover { background: rgba(230, 120, 30, 0.04); }
+        .block .header .block-title {
+            margin-bottom: 0;
+            font-size: var(--font-heading);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--heading);
+            font-family: 'Montserrat Alternates', sans-serif;
+        }
+        .block .header .block-title .icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+            transition: transform 0.5s;
+            display: inline-block;
+            color: var(--accent);
+            filter: drop-shadow(0 1px 4px var(--accent-glow));
+        }
+        .block .header:hover .block-title .icon { transform: rotate(360deg) scale(1.1); }
+        .block .collapse-btn {
+            font-size: 15px;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: transform 0.3s;
+            padding: 4px 12px;
+            border-radius: 8px;
+            pointer-events: none;
+            color: var(--accent);
+            background: rgba(230, 120, 30, 0.06);
+        }
+        .block .content {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.4s, opacity 0.3s;
+            margin-top: 0;
+        }
+        .block input[type="checkbox"]:checked ~ .content {
+            max-height: 15000px;
+            opacity: 1;
+            margin-top: 12px;
+        }
+        .block input[type="checkbox"]:checked ~ .header .collapse-btn {
+            transform: rotate(180deg);
+            background: rgba(230, 120, 30, 0.1);
+        }
+        .block.always-open .content {
+            max-height: 15000px;
+            opacity: 1;
+            margin-top: 12px;
+        }
+        .block.always-open .collapse-btn { display: none; }
+        .block.always-open .header { cursor: default; }
+        .block.always-open .header:hover .block-title .icon { transform: none; }
+        .block p, .block li {
+            font-size: var(--font-sm);
+            line-height: 1.7;
+            color: var(--text);
+        }
+        .block ul, .block ol { padding-left: 24px; margin: 8px 0; }
+        .block li { margin-bottom: 3px; }
+
+        .highlight { font-weight: 700; color: var(--accent); }
+        .text-muted { font-size: var(--font-xs); color: var(--text-secondary); font-style: italic; }
+
+        .rule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-left: 2px;
+        }
+        .rule-item {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            padding: 10px 16px 10px 18px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 14px;
+            border-left: 3px solid rgba(230, 120, 30, 0.12);
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            cursor: default;
+            font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+        }
+        .rule-item:hover {
+            background: rgba(230, 120, 30, 0.04);
+            border-left-color: var(--accent);
+            transform: translateX(4px);
+        }
+        .rule-number {
+            font-weight: 700;
+            color: var(--accent);
+            opacity: 0.6;
+            min-width: 32px;
+            font-size: 0.8rem;
+            letter-spacing: 0.02em;
+        }
+        .rule-text { color: var(--text); font-weight: 400; }
+        .rule-text strong { color: var(--accent); font-weight: 600; }
+        .rule-penalty {
+            display: inline-block;
+            background: rgba(230, 120, 30, 0.08);
+            border-radius: 40px;
+            padding: 2px 14px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            border: 1px solid rgba(230, 120, 30, 0.08);
+            margin-left: 6px;
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+        }
+
+        .staff-block {
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            background: var(--staff-card-bg);
+            box-shadow: var(--block-shadow);
+        }
+        .staff-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-weight: 800;
+            font-size: clamp(16px, 3vw, 20px);
+            color: var(--heading);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .staff-title .icon { color: var(--accent); font-size: 22px; }
+        .staff-group {
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: rgba(230, 120, 30, 0.03);
+            border: 1px solid rgba(230, 120, 30, 0.08);
+        }
+        body.dark .staff-group {
+            background: rgba(230, 120, 30, 0.03);
+            border-color: rgba(230, 120, 30, 0.08);
+        }
+        .staff-group-title {
+            font-weight: 700;
+            font-size: var(--font-sm);
+            color: var(--accent);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .staff-group-title .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 700;
+            background: var(--accent);
+            color: #fff;
+        }
+        .staff-list {
+            list-style: none;
+            padding: 0;
+            font-size: var(--font-sm);
+            line-height: 1.6;
+            color: var(--text);
+        }
+        .staff-list li {
+            padding: 2px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .staff-list li .name {
+            font-weight: 600;
+            color: var(--heading);
+        }
+        .staff-list li .nick {
+            color: var(--text-secondary);
+            font-size: var(--font-xs);
+        }
+
+        .footer {
+            text-align: center;
+            padding-top: 18px;
+            margin-top: 10px;
+            border-top: 1.5px solid var(--border);
+            color: var(--text-secondary);
+            font-size: var(--font-xs);
+        }
+        .footer span { color: var(--accent); font-weight: 700; }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: var(--font-xs);
+            font-weight: 700;
+            text-decoration: none;
+            transition: all var(--transition);
+            color: var(--badge-text);
+            background: var(--badge-bg);
+            border: 1px solid var(--accent);
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+        .footer-links a:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+            transition: all var(--transition);
+            box-shadow: 0 4px 20px var(--accent-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .scroll-top-btn.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .scroll-top-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        @media (max-width: 768px) {
+            :root { --font-base: 14px; --font-sm: 13px; --font-xs: 12px; --font-heading: 16px; }
+            .container { padding: 20px 14px; border-radius: 22px; }
+            .main-title { font-size: 22px; }
+            .header-actions { justify-content: center; }
+            .rule-item { padding: 10px 12px; flex-wrap: wrap; gap: 6px; }
+            .rule-penalty { font-size: 0.6rem; padding: 2px 10px; }
+            .block { padding: 12px 14px; }
+            .staff-block { padding: 12px 14px; }
+            .toggle-btn, .download-btn { padding: 8px 18px; font-size: 13px; }
+            .badge-version { font-size: 11px; padding: 5px 16px; }
+            .footer-links a { font-size: 11px; padding: 6px 14px; }
+            .copy-toast { font-size: 12px; padding: 8px 18px; bottom: 20px; }
+            .scroll-top-btn { width: 40px; height: 40px; font-size: 17px; bottom: 20px; right: 20px; }
+        }
+        @media (max-width: 480px) {
+            :root { --font-base: 13px; --font-sm: 12px; --font-xs: 11px; --font-heading: 15px; }
+            .container { padding: 14px 10px; border-radius: 18px; }
+            .main-title { font-size: 19px; }
+            .block { padding: 10px 12px; border-radius: 14px; }
+            .block .header .block-title { font-size: 14px; gap: 8px; }
+            .block .header .block-title .icon { font-size: 16px; width: 22px; }
+            .rule-item { font-size: 0.85rem; }
+            .rule-number { min-width: 24px; font-size: 0.7rem; }
+            .toggle-btn, .download-btn { font-size: 12px; padding: 7px 14px; gap: 6px; }
+            .footer-links a { font-size: 10px; padding: 5px 12px; }
+            .staff-block { padding: 10px 10px; }
+            .scroll-top-btn { width: 36px; height: 36px; font-size: 15px; bottom: 16px; right: 16px; }
+            .copy-toast { font-size: 11px; padding: 6px 14px; bottom: 16px; }
+        }
+    </style>
+</head>
+<body class="light">
+
+    <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+    <div class="copy-toast" id="copyToast"><i class="fas fa-check-circle" style="color:#f59a3a;"></i> Скопировано</div>
+
+    <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <div class="container">
+
+        <div class="header-actions">
+            <button class="toggle-btn" id="themeToggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i> Тёмная тема
+            </button>
+            <button class="download-btn" id="downloadBtn" onclick="downloadRules()">
+                <i class="fas fa-download"></i> Скачать .txt
+            </button>
+        </div>
+
+        <div class="main-title"><span class="gradient-text">⚖️ Свод правил WMine</span></div>
+        <div style="text-align:center;"><span class="badge-version"><i class="fas fa-calendar-check"></i> 11.08.2026</span></div>
+        <div class="sub-header">Используя сервер, вы принимаете все нижеприведённые правила. Нажмите на любой пункт, чтобы скопировать его.</div>
+
+        <!-- 1. Пользовательское соглашение -->
+        <div class="block always-open">
+            <div class="header"><span class="block-title"><i class="fas fa-file-contract icon"></i> 1. Пользовательское соглашение</span><span class="collapse-btn">▼</span></div>
+            <div class="content"><div class="rule-list">
+                <div class="rule-item"><span class="rule-number">1.0</span><span class="rule-text">Играя на наших серверах, вы соглашаетесь со всеми правилами. В случае несогласия вы обязаны прекратить игру на серверах WMine.</span></div>
+                <div class="rule-item"><span class="rule-number">1.1</span><span class="rule-text">Незнание правил не освобождает от ответственности. Взлом аккаунта не является оправданием, если факт взлома не был доказан администрацией.</span></div>
+                <div class="rule-item"><span class="rule-number">1.2</span><span class="rule-text">Администратор вправе наказать игрока по своему усмотрению, в том числе за нарушения, не прописанные в правилах явно.</span></div>
+                <div class="rule-item"><span class="rule-number">1.3</span><span class="rule-text">Модерация не возвращает вещи, утерянные в результате отката, воровства, гриферства, обмана или бага.</span></div>
+                <div class="rule-item"><span class="rule-number">1.4</span><span class="rule-text">Все покупки на сервере WMine добровольны. Средства идут на развитие проекта. <strong>Возврат средств за купленный донат не предусмотрен.</strong></span></div>
+                <div class="rule-item"><span class="rule-number">1.5</span><span class="rule-text">За нарушение правил администрация имеет право аннулировать вашу привилегию без компенсации.</span></div>
+                <div class="rule-item"><span class="rule-number">1.6</span><span class="rule-text">Правила могут быть изменены в любое время. Актуальная информация публикуется в нашем сообществе ВК.</span></div>
+                <div class="rule-item"><span class="rule-number">1.7</span><span class="rule-text">Администрация вправе отказать в услугах при хамском поведении или оскорблении персонала.</span></div>
+            </div></div>
+        </div>
+
+        <!-- 2. Запрещённое в чате -->
+        <div class="block">
+            <input type="checkbox" id="r2"><label class="header" for="r2"><span class="block-title"><i class="fas fa-comments icon"></i> 2. Запрещённое в чате</span><span class="collapse-btn">▼</span></label>
+            <div class="content"><div class="rule-list">
+                <div class="rule-item"><span class="rule-number">2.0</span><span class="rule-text">Унижение в любом виде, а также оскорбление чести и достоинства игроков. <span class="rule-penalty">Ограничение чата на 30 минут</span></span></div>
+                <div class="rule-item"><span class="rule-number">2.1</span><span class="rule-text">Попрошайничество в любом виде (ресурсы, донат, права). <span class="rule-penalty">Ограничение чата на 15 минут</span></span></div>
+                <div class="rule-item"><span class="rule-number">2.2</span><span class="rule-text">Реклама сторонних серверов, сайтов и мошеннических проектов. <span class="rule-penalty">Блокировка аккаунта навсегда</span></span></div>
+                <div class="rule-item"><span class="rule-number">2.3</span><span class="rule-text">Флуд, спам, чрезмерное использование заглавных букв и спецсимволов (&amp;k). <span class="rule-penalty">Ограничение чата на 20 минут</span></span></div>
+                <div class="rule-item"><span class="rule-number">2.4</span><span class="rule-text">Оскорбление проекта или его руководства. <span class="rule-penalty">Вечное ограничение чата / Блокировка на усмотрение администрации</span></span></div>
+                <div class="rule-item"><span class="rule-number">2.5</span><span class="rule-text">Упоминание родных в оскорбительном или унизительном контексте. <span class="rule-penalty">Ограничение чата на 60 минут</span></span></div>
+                <div class="rule-item"><span class="rule-number">2.6</span><span class="rule-text">Разжигание межнациональной или политической розни. <span class="rule-penalty">Ограничение чата на 60 минут</span></span></div>
+            </div></div>
+        </div>
+
+        <!-- 3. Правила строительства -->
+        <div class="block">
+            <input type="checkbox" id="r3"><label class="header" for="r3"><span class="block-title"><i class="fas fa-cubes icon"></i> 3. Правила строительства</span><span class="collapse-btn">▼</span></label>
+            <div class="content"><div class="rule-list">
+                <div class="rule-item"><span class="rule-number">3.0</span><span class="rule-text">Создание построек, нагружающих сервер или вызывающих задержки (лаг-машины). <span class="rule-penalty">Блокировка аккаунта навсегда</span></span></div>
+                <div class="rule-item"><span class="rule-number">3.1</span><span class="rule-text">Строительство столбов, глубоких ям и хаотичный разлив жидкости (вода/лава) без цели. <span class="rule-penalty">Предупреждение (1/3) + Снос постройки</span></span></div>
+                <div class="rule-item"><span class="rule-number">3.2</span><span class="rule-text">Строительство оскорбительных символов, нецензурных слов или построек 18+. <span class="rule-penalty">Блокировка на 2 дня + Снос постройки</span></span></div>
+                <div class="rule-item"><span class="rule-number">3.3</span><span class="rule-text">Порча территории вокруг чужого привата (блокировка выхода, заливка лавой краёв привата). <span class="rule-penalty">Предупреждение (1/3)</span></span></div>
+                <div class="rule-item"><span class="rule-number">3.4</span><span class="rule-text">Строительство на путях общего пользования (дороги, спавн). <span class="rule-penalty">Снос постройки без предупреждения / Предупреждение при повторе</span></span></div>
+            </div></div>
+        </div>
+
+        <!-- 4. Правила для донатеров -->
+        <div class="block">
+            <input type="checkbox" id="r4"><label class="header" for="r4"><span class="block-title"><i class="fas fa-gem icon"></i> 4. Правила для донатеров</span><span class="collapse-btn">▼</span></label>
+            <div class="content"><div class="rule-list">
+                <div class="rule-item"><span class="rule-number">4.0</span><span class="rule-text">Блокировка, отключение или ограничение чата игроков без корректной причины. <span class="rule-penalty">Предупреждение (1/3) или Снятие привилегии</span></span></div>
+                <div class="rule-item"><span class="rule-number">4.1</span><span class="rule-text">Использование донатерских возможностей (/fly, /god, /vanish) в PvP-зонах для получения преимущества. <span class="rule-penalty">Предупреждение (1/3)</span></span></div>
+                <div class="rule-item"><span class="rule-number">4.2</span><span class="rule-text">Установка ловушек на точках быстрого перемещения (/setwarp), приводящих к смерти игроков. <span class="rule-penalty">Удаление точки + Блокировка на 7 дней</span></span></div>
+                <div class="rule-item"><span class="rule-number">4.3</span><span class="rule-text">Помеха игровому процессу других игроков с использованием административных возможностей (телепорт без разрешения, невидимость). <span class="rule-penalty">Предупреждение (1/3) / Снятие прав</span></span></div>
+            </div></div>
+        </div>
+
+        <!-- 5. Геймплейная часть -->
+        <div class="block">
+            <input type="checkbox" id="r5"><label class="header" for="r5"><span class="block-title"><i class="fas fa-shield-alt icon"></i> 5. Геймплейная часть</span><span class="collapse-btn">▼</span></label>
+            <div class="content"><div class="rule-list">
+                <div class="rule-item"><span class="rule-number">5.0</span><span class="rule-text">Использование или хранение читов, стороннего программного обеспечения. <span class="rule-penalty">Блокировка на 12 дней</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.1</span><span class="rule-text">Добровольное признание в использовании читов. <span class="rule-penalty">Блокировка на 6 дней</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.2</span><span class="rule-text">Отказ или игнорирование проверки на читы со стороны модерации. <span class="rule-penalty">Блокировка на 12 дней</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.3</span><span class="rule-text">Использование оскорбительных или некорректных имён. <span class="rule-penalty">Блокировка аккаунта навсегда</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.4</span><span class="rule-text">Обман или введение в заблуждение администрации. <span class="rule-penalty">Блокировка аккаунта навсегда</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.5</span><span class="rule-text">Продажа аккаунта или передача его третьим лицам. <span class="rule-penalty">Блокировка аккаунта навсегда</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.6</span><span class="rule-text">Продажа внутриигровых предметов за реальные деньги. <span class="rule-penalty">Блокировка по IP</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.7</span><span class="rule-text">Использование ошибок сервера или игры для получения выгоды. <span class="rule-penalty">Предупреждение (1/3) или Блокировка (зависит от тяжести)</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.8</span><span class="rule-text">Использование, хранение или распространение дублированных предметов, а также сам процесс дублирования. <span class="rule-penalty">Блокировка навсегда + Очистка инвентаря/региона</span></span></div>
+                <div class="rule-item"><span class="rule-number">5.9</span><span class="rule-text">Сокрытие информации о найденных ошибках или дублировании от администрации. <span class="rule-penalty">Предупреждение (1/3) или Блокировка</span></span></div>
+            </div></div>
+        </div>
+
+        <!-- Список создателей -->
+        <div class="staff-block">
+            <div class="staff-title"><i class="fas fa-crown icon"></i> 💛 Создатели проекта</div>
+            <div class="staff-group">
+                <ul class="staff-list">
+                    <li><span class="name">Iwwi</span> <span class="nick">— Создатель, разработчик</span></li>
+                    <li><span class="name">Set1kk</span> <span class="nick">— Создатель, разработчик</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-main"><span>WMine</span> &bull; 11.08.2026</div>
+            <div class="footer-links">
+                <a href="https://t.me/wminepe" target="_blank"><i class="fab fa-telegram-plane"></i> @wminepe</a>
+                <a href="https://t.me/notworkch" target="_blank"><i class="fab fa-telegram-plane"></i> @notworkch</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ——— Theme ———
+        (function() {
+            var body = document.body;
+            var btn = document.getElementById('themeToggle');
+            try {
+                var saved = localStorage.getItem('wmine-theme');
+                if (saved === 'dark') {
+                    body.classList.remove('light');
+                    body.classList.add('dark');
+                    if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> Светлая тема';
+                }
+            } catch (e) {}
+        })();
+
+        function toggleTheme() {
+            var body = document.body;
+            var btn = document.getElementById('themeToggle');
+            if (body.classList.contains('dark')) {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                btn.innerHTML = '<i class="fas fa-moon"></i> Тёмная тема';
+                try { localStorage.setItem('wmine-theme', 'light'); } catch (e) {}
+            } else {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                btn.innerHTML = '<i class="fas fa-sun"></i> Светлая тема';
+                try { localStorage.setItem('wmine-theme', 'dark'); } catch (e) {}
+            }
+        }
+
+        // ——— Download ———
+        function downloadRules() {
+            var rulesText = "ПРАВИЛА ПРОЕКТА WMine — 11.08.2026\n========================================\n\n1. ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ\n1.0. Играя на серверах, вы соглашаетесь со всеми правилами.\n1.1. Незнание правил не освобождает от ответственности.\n1.2. Администратор вправе наказать за нарушения, даже не прописанные явно.\n1.3. Модерация не возвращает вещи, утерянные из-за отката или гриферства.\n1.4. Возврат средств за донат не предусмотрен.\n1.5. Привилегия может быть аннулирована без компенсации.\n1.6. Правила могут быть изменены в любое время.\n1.7. Администрация вправе отказать в услугах при хамском поведении.\n\n2. ЗАПРЕЩЁННОЕ В ЧАТЕ\n2.0. Унижение игроков → Ограничение чата 30 мин\n2.1. Попрошайничество → Ограничение чата 15 мин\n2.2. Реклама сторонних проектов → Блокировка навсегда\n2.3. Флуд, спам, капс → Ограничение чата 20 мин\n2.4. Оскорбление проекта → Вечный мут / Блокировка\n2.5. Оскорбление родных → Ограничение чата 60 мин\n2.6. Разжигание розни → Ограничение чата 60 мин\n\n3. ПРАВИЛА СТРОИТЕЛЬСТВА\n3.0. Лаг-машины → Блокировка навсегда\n3.1. Столбы, ямы, хаотичный разлив → Предупреждение (1/3) + Снос\n3.2. Оскорбительные постройки → Блокировка 2 дня + Снос\n3.3. Порча привата → Предупреждение (1/3)\n3.4. Строительство на дорогах → Снос / Предупреждение\n\n4. ПРАВИЛА ДЛЯ ДОНАТЕРОВ\n4.0. Блокировка без причины → Предупреждение (1/3) / Снятие привилегии\n4.1. Использование команд в PvP → Предупреждение (1/3)\n4.2. Ловушки на варпах → Удаление варпа + Блокировка 7 дней\n4.3. Помеха с админ-правами → Предупреждение (1/3) / Снятие прав\n\n5. ГЕЙМПЛЕЙНАЯ ЧАСТЬ\n5.0. Читы, стороннее ПО → Блокировка 12 дней\n5.1. Признание в читах → Блокировка 6 дней\n5.2. Отказ от проверки → Блокировка 12 дней\n5.3. Оскорбительные никнеймы → Блокировка навсегда\n5.4. Обман администрации → Блокировка навсегда\n5.5. Продажа аккаунта → Блокировка навсегда\n5.6. Продажа предметов за реал → Блокировка по IP\n5.7. Использование багов → Предупреждение (1/3) / Блокировка\n5.8. Дублирование предметов → Блокировка навсегда + Очистка\n5.9. Сокрытие информации о багах → Предупреждение (1/3) / Блокировка\n\n💛 СОЗДАТЕЛИ ПРОЕКТА\nIwwi — Создатель, разработчик\nSet1kk — Создатель, разработчик";
+
+            var blob = new Blob([rulesText], { type: 'text/plain;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'Правила_WMine_11.08.2026.txt';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        // ——— Copy ———
+        var toast = document.getElementById('copyToast');
+        var toastTimer;
+        document.addEventListener('click', function(e) {
+            var el = e.target.closest('.copyable');
+            if (!el) return;
+            var text = el.getAttribute('data-copy');
+            if (!text) return;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast();
+                }).catch(function() {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        });
+
+        function fallbackCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (e) {}
+            document.body.removeChild(ta);
+        }
+
+        function showToast() {
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2000);
+        }
+
+        // ——— Progress & Scroll ———
+        function updateProgress() {
+            var s = window.scrollY;
+            var d = document.documentElement.scrollHeight - window.innerHeight;
+            if (d > 0) document.getElementById('progressFill').style.width = (s / d) * 100 + '%';
+        }
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        updateProgress();
+
+        function updateScrollBtn() {
+            var btn = document.getElementById('scrollTopBtn');
+            if (window.scrollY > 300) btn.classList.add('visible');
+            else btn.classList.remove('visible');
+        }
+        window.addEventListener('scroll', updateScrollBtn, { passive: true });
+        updateScrollBtn();
+    </script>
+</body>
+</html>
